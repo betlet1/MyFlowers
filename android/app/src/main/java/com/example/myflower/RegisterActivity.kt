@@ -44,8 +44,7 @@ class RegisterActivity : AppCompatActivity() {
             val email = emailField.text.toString()
             val sifre = sifreField.text.toString()
 
-
-           if (ad.isNotEmpty() && soyad.isNotEmpty() && kullaniciAdi.isNotEmpty() && email.isNotEmpty() && sifre.isNotEmpty()) {
+            if (ad.isNotEmpty() && soyad.isNotEmpty() && kullaniciAdi.isNotEmpty() && email.isNotEmpty() && sifre.isNotEmpty()) {
                 // Firebase Authentication ile kullanıcı kaydı
                 firebaseAuth.createUserWithEmailAndPassword(email, sifre)
                     .addOnCompleteListener { task ->
@@ -58,8 +57,11 @@ class RegisterActivity : AppCompatActivity() {
                                     "soyad" to soyad,
                                     "kullaniciAdi" to kullaniciAdi,
                                     "email" to email,
-                                    "role" to "user"
+                                    "role" to "user",
+                                    "savedFlowers" to mutableMapOf<String, Boolean>() // Başlangıçta kaydedilen çiçekler boş
                                 )
+
+                                // Kullanıcı bilgilerini Firebase Realtime Database'e yazma
                                 database.child("Kullanıcılar").child(userId).setValue(userMap)
                                     .addOnSuccessListener {
                                         Toast.makeText(this, "Kayıt başarılı!", Toast.LENGTH_SHORT).show()
@@ -69,7 +71,7 @@ class RegisterActivity : AppCompatActivity() {
                                         Toast.makeText(this, "Veritabanı hatası: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
                             }
-                        }else {
+                        } else {
                             Toast.makeText(this, "Kayıt başarısız: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -77,7 +79,6 @@ class RegisterActivity : AppCompatActivity() {
                 Toast.makeText(this, "Lütfen tüm alanları doldurun.", Toast.LENGTH_SHORT).show()
             }
         }
-
 
         // Toolbar'ı tanımı ve geri butonunu aktif
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -87,7 +88,7 @@ class RegisterActivity : AppCompatActivity() {
 
         // Geri butonuna tıklanma
         toolbar.setNavigationOnClickListener {
-            finish()  //  Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
+            finish()  // Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.register)) { v, insets ->

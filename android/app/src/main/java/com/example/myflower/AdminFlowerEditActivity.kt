@@ -1,141 +1,108 @@
 package com.example.myflower
 
-import android.annotation.SuppressLint
-import android.app.ProgressDialog
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Button
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.cloudinary.android.MediaManager
-import com.cloudinary.android.callback.ErrorInfo
-import com.cloudinary.android.callback.UploadCallback
-import com.example.myflower.AdminFlowersActivity
+import com.example.myflower.model.Flower
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.squareup.picasso.Picasso
 
 class AdminFlowerEditActivity : AppCompatActivity() {
 
-    private lateinit var flowerName: String
-    private lateinit var flowerImage: String
-    private lateinit var flowerDescription: String
+    private lateinit var flowerNameEditText: EditText
+    private lateinit var flowerDescriptionEditText: EditText
+    private lateinit var flowerImageView: ImageView
+    private lateinit var uploadImageButton: Button
+    private lateinit var guncelleButton: Button
+    private var flowerId: String = ""  // Güncellenecek çiçeğin ID'si
+    private var imageUrl: String = ""  // Çiçek için resim URL'si
 
-    private lateinit var editTextName: EditText
-    private lateinit var imageViewFlower: ImageView
-    private lateinit var editTextDescription: EditText
-    private lateinit var saveButton: Button
-
-    private lateinit var progressDialog: ProgressDialog
-
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_admin_flower_edit)
 
-        // Toolbar tanımı ve geri butonunu aktif etme
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)  // Geri butonunu aktif etme
-        supportActionBar?.setDisplayShowHomeEnabled(true)
+        // Görünüm öğelerini bağla
+        flowerNameEditText = findViewById(R.id.flowerNameEditText)
+        flowerDescriptionEditText = findViewById(R.id.flowerDescriptionEditText)
+        flowerImageView = findViewById(R.id.flowerImageView)
+        uploadImageButton = findViewById(R.id.uploadImageButton)
+        guncelleButton = findViewById(R.id.guncelle_buton)
 
-        // Geri butonuna tıklanma
-        toolbar.setNavigationOnClickListener {
-            finish()  // Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
+        // Çiçek ID'sini al
+        flowerId = intent.getStringExtra("flowerId") ?: ""
+
+        // Çiçek bilgilerini Firebase'den çek
+        fetchFlowerDetails()
+
+        // Resim yükleme butonuna tıklandığında
+        uploadImageButton.setOnClickListener {
+            // Cloudinary üzerinden resim URL'sini al (örnek olarak)
+            val selectedImageUrl = "https://res.cloudinary.com/your-cloud-name/image/upload/v1677777777/flower_image.jpg" // Cloudinary URL'si
+            imageUrl = selectedImageUrl
+            Picasso.get().load(imageUrl).into(flowerImageView)
         }
 
-        // Sistem çubuğuyla uyumlu pencere ayarları
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.admin_flower_edit)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        // Güncelle butonuna tıklanırsa
+        guncelleButton.setOnClickListener {
+            updateFlowerInfo()
         }
-
-        // Layout bileşenlerini tanımlama
-        editTextName = findViewById(R.id.flowerNameEditText)
-        imageViewFlower = findViewById(R.id.flowerImageView)
-        editTextDescription = findViewById(R.id.flowerDescriptionEditText)
-        saveButton = findViewById(R.id.guncelle_buton)
-
-        // Intent ile gelen çiçek verilerini alma
-        flowerName = intent.getStringExtra("flower_name") ?: ""
-        flowerImage = intent.getStringExtra("flower_image_url") ?: ""
-        flowerDescription = intent.getStringExtra("flower_description") ?: ""
-
-        // Verileri UI bileşenlerine aktarma
-        editTextName.setText(flowerName)
-        editTextDescription.setText(flowerDescription)
-
-        // Cloudinary resmini Picasso ile yükleyerek gösterme
-        Picasso.get().load(flowerImage).into(imageViewFlower)
-
-        // Kaydetme işlemi
-        saveButton.setOnClickListener {
-            saveFlowerDetails()
-        }
-
-        // ProgressDialog tanımlama
-        progressDialog = ProgressDialog(this)
-        progressDialog.setMessage("Yükleniyor...")
     }
 
-    private fun saveFlowerDetails() {
-        val newFlowerName = editTextName.text.toString()
-        val newFlowerDescription = editTextDescription.text.toString()
+    // Firebase'den çiçek bilgilerini çekme
+    private fun fetchFlowerDetails() {
+        val database = FirebaseDatabase.getInstance().reference.child("flowers").child(flowerId)
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val flower = snapshot.getValue(Flower::class.java)
+                if (flower != null) {
+                    flowerNameEditText.setText(flower.name)
+                    flowerDescriptionEditText.setText(flower.description)
+                    Picasso.get().load(flower.imageUrl).into(flowerImageView)
+                    imageUrl = flower.imageUrl // Eski resim URL'sini kaydediyoruz
+                }
+            }
 
-        if (newFlowerName.isEmpty() || newFlowerDescription.isEmpty()) {
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@AdminFlowerEditActivity, "Veri çekme hatası: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    // Çiçek bilgilerini güncelleme
+    private fun updateFlowerInfo() {
+        val name = flowerNameEditText.text.toString().trim()
+        val description = flowerDescriptionEditText.text.toString().trim()
+
+        if (name.isEmpty() || description.isEmpty()) {
             Toast.makeText(this, "Lütfen tüm alanları doldurun.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Resmi yükleme işlemi (varsa yeni bir resim seçilmişse Cloudinary'ye yükleme)
-        val imageUrl = flowerImage // Burada imageUrl, Cloudinary'den gelen URL olmalı
+        // Yeni Flower nesnesi oluşturuyoruz
+        val updatedFlower = Flower(
+            id = flowerId, // Çiçeğin mevcut ID'si
+            imageUrl = imageUrl, // Yeni resim URL'si (eski ya da yeni)
+            name = name,
+            description = description
+        )
 
-        // Çiçek bilgilerini Cloudinary'ye kaydetme işlemi
-        updateFlowerDetails(newFlowerName, newFlowerDescription, imageUrl)
-    }
-
-    private fun updateFlowerDetails(name: String, description: String, imageUrl: String) {
-        progressDialog.show()
-
-        // Cloudinary'ye yükleme işlemi
-        val request = MediaManager.get().upload(imageUrl)
-            .callback(object : UploadCallback {
-                override fun onStart(requestId: String?) {
-                    Log.d("Cloudinary", "Yükleme başladı")
-                }
-
-                override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
-                    Log.d("Cloudinary", "Yükleme ilerleme: $bytes/$totalBytes")
-                }
-
-                override fun onSuccess(requestId: String?, resultData: Map<*, *>?) {
-                    progressDialog.dismiss()
-                    Toast.makeText(this@AdminFlowerEditActivity, "Çiçek bilgileri güncellendi.", Toast.LENGTH_SHORT).show()
-                    // Yedekleme ve yönlendirme işlemi
-                    val intent = Intent(this@AdminFlowerEditActivity, AdminFlowersActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-
-                // onError metodunu doğru şekilde implement et
-                override fun onError(requestId: String?, error: ErrorInfo?) {
-                    progressDialog.dismiss()
-                    Toast.makeText(this@AdminFlowerEditActivity, "Yükleme hatası: ${error?.description}", Toast.LENGTH_SHORT).show()
-                }
-
-                // onReschedule metodunu doğru şekilde implement et
-                override fun onReschedule(requestId: String?, error: ErrorInfo?) {
-                    Log.d("Cloudinary", "Yükleme yeniden planlandı, hata: ${error?.description}")
-                    progressDialog.dismiss()
-                    Toast.makeText(this@AdminFlowerEditActivity, "Yükleme yeniden planlandı, hata: ${error?.description}", Toast.LENGTH_SHORT).show()
-                }
-            }).dispatch()  // Yükleme işlemini başlat
+        // Firebase'e kaydetme
+        val database = FirebaseDatabase.getInstance().reference.child("flowers").child(flowerId)
+        database.setValue(updatedFlower).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(this, "Çiçek başarıyla güncellendi", Toast.LENGTH_SHORT).show()
+                finish()  // Activity'yi kapat
+            } else {
+                Toast.makeText(this, "Güncelleme hatası: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
+
+

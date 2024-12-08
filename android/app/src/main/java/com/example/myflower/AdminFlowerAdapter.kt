@@ -10,8 +10,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myflower.model.Flower
 import com.google.firebase.database.FirebaseDatabase
-import com.squareup.picasso.Picasso // Resim yüklemek için Picasso kütüphanesini kullanıyoruz.
+import com.squareup.picasso.Picasso
 
 class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val context: Context) :
     RecyclerView.Adapter<AdminFlowerAdapter.FlowerViewHolder>() {
@@ -50,9 +51,9 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         val flower = flowerList.find { it.id == flowerId }
         flower?.let {
             val intent = Intent(context, AdminFlowerEditActivity::class.java)
-            intent.putExtra("flower_id", it.id)  // Çiçeğin id'sini de ekleyebilirsiniz
+            intent.putExtra("flower_id", it.id)
             intent.putExtra("flower_name", it.name)
-            intent.putExtra("flower_image", it.imageUrl) // Base64 yerine URL gönderiyoruz
+            intent.putExtra("flower_image", it.imageUrl)
             intent.putExtra("flower_description", it.description)
             context.startActivity(intent)
         }

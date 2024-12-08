@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Button
+import com.example.myflower.model.Flower
 import com.squareup.picasso.Picasso // Resim yüklemek için Picasso kütüphanesini kullanıyoruz
 
 class FlowerAdapter(private val flowerList: ArrayList<Flower>, private val context: Context) :

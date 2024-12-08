@@ -16,7 +16,6 @@
         android:textSize="24sp"
         android:background="@color/mor"
         android:elevation="4dp"
-        android:title="Kayıt Ol"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

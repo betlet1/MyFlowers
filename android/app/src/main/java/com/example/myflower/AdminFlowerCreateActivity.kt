@@ -21,6 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.cloudinary.Cloudinary
 import com.cloudinary.utils.ObjectUtils
+import com.example.myflower.model.Flower
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -123,9 +124,8 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
 
     // Cloudinary'ye resmi yükleme fonksiyonu
     private fun uploadImageToCloudinary(uri: Uri, flower: Flower) {
-        val cloudinary = Cloudinary("cloudinary://your_api_key:your_api_secret@your_cloud_name")
+        val cloudinary = Cloudinary("cloudinary://674952127384548:Ft-dPH-ZbxNuC478A8i9VWk9vkM@dr2frdnxk")
         val file = File(getRealPathFromURI(uri))
-        val options = HashMap<String, Any>()
 
         // Resmi Cloudinary'ye yükleme işlemi
         Thread {
