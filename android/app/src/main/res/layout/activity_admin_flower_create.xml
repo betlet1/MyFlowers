@@ -1,0 +1,111 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/admin_flower_create"
+    android:background="@color/white"
+    tools:context=".AdminFlowerCreateActivity">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/mor"
+        android:elevation="4dp"
+        app:title="Çiçek Kayıt Formu"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="@drawable/ik_geri"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Başlık -->
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yeni Çiçek Kaydı"
+        android:textColor="@color/griRenk01"
+        android:textSize="24sp"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- Çiçek Adı Girişi -->
+    <EditText
+        android:id="@+id/flowerNameEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Çiçek Adı"
+        android:padding="12dp"
+        android:background="@color/white"
+        android:textColorHint="@color/griRenk01"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="16dp" />
+
+    <!-- Çiçek Açıklama -->
+    <EditText
+        android:id="@+id/flowerDescriptionEditText"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:hint="Çiçek Açıklaması"
+        android:padding="12dp"
+        android:textColorHint="@color/griRenk01"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        app:layout_constraintTop_toBottomOf="@id/flowerNameEditText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp" />
+
+    <!-- Resim Yükle -->
+    <Button
+        android:id="@+id/uploadImageButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Resim Yükle"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:backgroundTint="@color/mavi"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/flowerDescriptionEditText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="16dp" />
+
+    <!-- Yüklenen Resim Önizlemesi -->
+    <ImageView
+        android:id="@+id/flowerImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="10dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Seçilen Çiçek Resmi"
+        app:layout_constraintTop_toBottomOf="@id/uploadImageButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="16dp" />
+
+    <!-- Ekle Butonu -->
+    <Button
+        android:id="@+id/addButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Oluştur"
+        android:textSize="18sp"
+        android:padding="14dp"
+        android:backgroundTint="@color/yesil"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/flowerImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="16dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

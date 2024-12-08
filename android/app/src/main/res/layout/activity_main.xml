@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main"
+    app:cardElevation="8dp"
+    tools:context=".MainActivity">
+
+    <!-- Arka plan ve içerik için FrameLayout -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Arka plan resmi -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/orkide2" />
+
+        <!-- Karartma efekti -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000" /> <!-- %50 şeffaf siyah -->
+
+        <!-- İçerik -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/user_login"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:backgroundTint="@color/acikpembe"
+                android:text="Kullanıcı Girişi"
+                android:textSize="18sp"
+                app:cornerRadius="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/admin_login"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.491"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/admin_login"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="@color/acikmor"
+                android:text="Admin Girişi"
+                android:textSize="18sp"
+                app:cornerRadius="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/user_login" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</com.google.android.material.card.MaterialCardView>
