@@ -1,31 +1,84 @@
 package com.example.myflower
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import androidx.activity.enableEdgeToEdge
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 
 class AdminLoginActivity : AppCompatActivity() {
-    @SuppressLint("MissingInflatedId")
+
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var databaseReference: DatabaseReference
+    private lateinit var editTextEmail: TextInputEditText
+    private lateinit var editTextPassword: TextInputEditText
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_admin_login)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.admin_login)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        firebaseAuth = FirebaseAuth.getInstance()
+        databaseReference = FirebaseDatabase.getInstance().getReference("Admin") // Admin kontrolü için doğru referans
+        editTextEmail = findViewById(R.id.mailInput)
+        editTextPassword = findViewById(R.id.passwordInput)
+
+        val adminLoginButton = findViewById<MaterialButton>(R.id.btnLogin)
+        adminLoginButton.setOnClickListener {
+            val email = editTextEmail.text.toString().trim()
+            val password = editTextPassword.text.toString().trim()
+
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "E-posta ve şifre boş olamaz.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                // Firebase Authentication ile giriş yap
+                firebaseAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            // Authentication başarılı, admin kontrolü yap
+                            checkAdminRole(firebaseAuth.currentUser?.uid ?: "")
+                        } else {
+                            Toast.makeText(this, "Giriş başarısız: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            } else {
+                Toast.makeText(this, "Lütfen tüm alanları doldurun.", Toast.LENGTH_SHORT).show()
+            }
         }
-        // Admin Giriş
-        val adminLoginButton=findViewById<MaterialButton>(R.id.btnLogin)
-        adminLoginButton.setOnClickListener{
-            val intent=Intent(this, AdminFlowersActivity::class.java)
-            startActivity(intent)
-        }
+    }
+
+    private fun checkAdminRole(userId: String) {
+        // Veritabanından admin kontrolü
+        databaseReference.child(userId).child("role").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val role = snapshot.getValue(String::class.java)
+                    if (role == "admin") {
+                        // Kullanıcı admin ise admin ekranına yönlendir
+                        val intent = Intent(this@AdminLoginActivity, AdminFlowersActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        // Kullanıcı admin değilse
+                        Toast.makeText(this@AdminLoginActivity, "Bu kullanıcı admin değil.", Toast.LENGTH_SHORT).show()
+                        firebaseAuth.signOut()
+                    }
+                } else {
+                    // Role bilgisi yoksa
+                    Toast.makeText(this@AdminLoginActivity, "Admin bilgisi bulunamadı.", Toast.LENGTH_SHORT).show()
+                    firebaseAuth.signOut()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@AdminLoginActivity, "Veritabanı hatası: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }

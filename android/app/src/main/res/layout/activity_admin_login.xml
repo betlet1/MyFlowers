@@ -42,17 +42,17 @@
 
         <!-- Kullanıcı Adı -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/usernameInputLayout"
+            android:id="@+id/mailInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:hint="Kullanıcı Adı"
+            android:hint="Mail"
             app:layout_constraintTop_toBottomOf="@id/txtLoginTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/usernameInput"
+                android:id="@+id/mailInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Şifre"
-            app:layout_constraintTop_toBottomOf="@id/usernameInputLayout"
+            app:layout_constraintTop_toBottomOf="@id/mailInputLayout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 

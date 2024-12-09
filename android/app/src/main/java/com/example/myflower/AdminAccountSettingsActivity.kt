@@ -48,16 +48,16 @@ class AdminAccountSettingsActivity : AppCompatActivity() {
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val adminData = snapshot.value
-                    Log.d("AdminSettings", "Admin verisi: $adminData")
+                    val email = snapshot.child("email").getValue(String::class.java) ?: ""
+                    mailField.setText(email) // E-posta bilgisi ekrana yansıtılıyor
                 } else {
                     Log.w("AdminSettings", "Admin verisi bulunamadı.")
                 }
             }
+
             override fun onCancelled(error: DatabaseError) {
                 Log.e("AdminSettings", "Hata: ${error.message}")
             }
-
         })
 
         // Profil güncelleme işlemi
@@ -69,10 +69,9 @@ class AdminAccountSettingsActivity : AppCompatActivity() {
                 // Firebase Authentication ile şifreyi güncelle
                 firebaseAuth.currentUser?.updatePassword(sifre)?.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        // Firebase veritabanına yeni bilgileri kaydet
+                        // Firebase veritabanına e-posta bilgisini güncelle
                         val updatedUserMap = mapOf(
-                            "email" to mail,
-                            "role" to "user"
+                            "email" to mail
                         )
                         userRef.updateChildren(updatedUserMap)
                             .addOnSuccessListener {
@@ -98,7 +97,7 @@ class AdminAccountSettingsActivity : AppCompatActivity() {
 
         // Geri butonuna tıklanma
         toolbar.setNavigationOnClickListener {
-            finish()  //  Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
+            finish()  // Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.admin_account_settings)) { v, insets ->

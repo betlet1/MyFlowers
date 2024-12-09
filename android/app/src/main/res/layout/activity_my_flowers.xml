@@ -17,6 +17,7 @@
         android:background="@color/mor"
         android:elevation="4dp"
         android:title="Çiçeklerim"
+        app:navigationIcon="@drawable/ik_geri"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

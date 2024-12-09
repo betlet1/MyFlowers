@@ -2,6 +2,7 @@ package com.example.myflower
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Button
@@ -55,9 +56,13 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
             intent.putExtra("flower_name", it.name)
             intent.putExtra("flower_image", it.imageUrl)
             intent.putExtra("flower_description", it.description)
+            Log.d("EditClick", "Flower ID: ${it.id}, Name: ${it.name}, Image: ${it.imageUrl}")
             context.startActivity(intent)
+        } ?: run {
+            Toast.makeText(context, "Çiçek bilgisi bulunamadı.", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun onDeleteClick(flowerId: String) {
         // Adminden silme işlemi onayı
@@ -75,20 +80,20 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
     }
 
     private fun deleteFlowerFromDatabase(flowerId: String) {
-        // Firebase Realtime Database referansını alın
         val databaseReference = FirebaseDatabase.getInstance().getReference("flowers")
-
-        // Çiçeği silmek için çiçek id'sini kullanarak referansı belirleyin
         databaseReference.child(flowerId).removeValue()
             .addOnSuccessListener {
-                // Silme işlemi başarılı olduğunda yapılacaklar
                 Toast.makeText(context, "Çiçek başarıyla silindi.", Toast.LENGTH_SHORT).show()
+                Log.d("DeleteFlower", "Çiçek silindi: $flowerId")
+                flowerList.removeAll { it.id == flowerId }
+                notifyDataSetChanged()
             }
             .addOnFailureListener { exception ->
-                // Silme işlemi sırasında hata oluşursa yapılacaklar
                 Toast.makeText(context, "Hata: ${exception.message}", Toast.LENGTH_LONG).show()
+                Log.e("DeleteFlower", "Silme hatası: ${exception.message}", exception)
             }
     }
+
 
     class FlowerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val flowerImage: ImageView = itemView.findViewById(R.id.flowerImage)

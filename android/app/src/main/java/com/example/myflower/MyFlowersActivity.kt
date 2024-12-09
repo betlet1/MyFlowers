@@ -1,9 +1,11 @@
 package com.example.myflower
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myflower.model.Flower
@@ -46,6 +48,18 @@ class MyFlowersActivity : AppCompatActivity() {
             }.addOnFailureListener {
                 Toast.makeText(this, "Veri alınırken hata oluştu", Toast.LENGTH_SHORT).show()
             }
+        }
+        // Toolbar'ı tanımla ve geri butonunu aktif et
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)  // Geri butonunu aktif et
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        // Geri butonuna tıklanma
+        toolbar.setNavigationOnClickListener {
+            val intent = Intent(this, FlowersActivity::class.java)  // FlowersActivity'ye git
+            startActivity(intent)  // Yeni aktiviteyi başlat
+            finish()  // Mevcut aktiviteyi sonlandır
         }
     }
 

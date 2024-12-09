@@ -60,7 +60,7 @@
 
 
             <!-- Çiçek Adı -->
-            <EditText
+            <TextView
                 android:id="@+id/flowerNameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                 android:layout_marginBottom="16dp" />
 
             <!-- Çiçek Özellikleri (Daha fazla alan) -->
-            <EditText
+            <TextView
                 android:id="@+id/flowerDescriptionEditText"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
