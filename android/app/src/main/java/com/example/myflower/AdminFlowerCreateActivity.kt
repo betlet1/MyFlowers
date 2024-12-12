@@ -4,12 +4,9 @@ package com.example.myflower
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Base64
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -25,11 +22,8 @@ import com.example.myflower.model.Flower
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.IOException
 import java.util.*
-import kotlin.collections.HashMap
 
 class AdminFlowerCreateActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
@@ -42,7 +36,6 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
 
     private val REQUEST_PERMISSION_CODE = 200  // İzin isteği için
 
-    // pickImageLauncher'ı sınıf seviyesinde tanımladık
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         imageUri = uri
         flowerImageView.setImageURI(uri)  // Görüntüyü önizlemede göster
@@ -67,17 +60,15 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
         // Toolbar'ı tanımı ve geri butonunu aktif
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)  // Geri butonunu aktif
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        // Geri butonuna tıklanma
         toolbar.setNavigationOnClickListener {
             finish()  // Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
         }
 
         uploadImageButton.setOnClickListener {
-            // İzin kontrolü yap
-            checkPermission()
+            checkPermission()  // İzin kontrolü
         }
 
         addButton.setOnClickListener {
@@ -85,7 +76,6 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
             val aciklama = aciklamaField.text.toString()
 
             if (ad.isNotEmpty() && aciklama.isNotEmpty()) {
-
                 val flower = Flower(
                     id = UUID.randomUUID().toString(),
                     imageUrl = "",  // Başlangıçta boş URL, Cloudinary'ye yükleme sonrası güncellenir
@@ -103,21 +93,18 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
                 Toast.makeText(this, "Lütfen tüm alanları doldurun ve resim seçin.", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
     // Depolama izni kontrol fonksiyonu
     private fun checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED) {
-            // İzin verilmemişse, izin isteği gönder
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                 REQUEST_PERMISSION_CODE
             )
         } else {
-            // İzin verildiyse, resmi seçmek için işlemi başlat
             pickImageLauncher.launch("image/*")
         }
     }
@@ -132,9 +119,8 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
             try {
                 val uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap())
                 val imageUrl = uploadResult["url"].toString()  // Cloudinary URL'si
-                flower.imageUrl = imageUrl  // 'imageUrl' artık 'var' olduğu için güncellenebilir
+                flower.imageUrl = imageUrl
 
-                // Resmi Cloudinary'ye yükledikten sonra Firebase'e kaydet
                 saveFlowerToDatabase(flower)
             } catch (e: Exception) {
                 runOnUiThread {
@@ -143,8 +129,6 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
             }
         }.start()
     }
-
-
 
     // URI'den gerçek dosya yolunu al
     private fun getRealPathFromURI(uri: Uri): String {
@@ -158,17 +142,16 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
 
     // Firebase Realtime Database'e çiçek bilgilerini kaydetme
     private fun saveFlowerToDatabase(flower: Flower) {
-        val flowerRef = database.child("flowers").push()  // Yeni bir node oluşturuyor
+        val flowerRef = database.child("Flowers").push()  //Yeni bir node oluşturuyor
 
         flowerRef.setValue(flower)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Çiçek başarıyla eklendi.", Toast.LENGTH_SHORT).show()
-                    finish() // Ana sayfaya geri yönlendirme
+                    finish()
                 } else {
                     Toast.makeText(this, "Çiçek eklenemedi: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
-
 }

@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myflower.model.Flower
@@ -60,6 +62,13 @@ class MyFlowersActivity : AppCompatActivity() {
             val intent = Intent(this, FlowersActivity::class.java)  // FlowersActivity'ye git
             startActivity(intent)  // Yeni aktiviteyi başlat
             finish()  // Mevcut aktiviteyi sonlandır
+        }
+
+        // Sistem çubuğuyla uyumlu pencere ayarları
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.my_flowers)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
         }
     }
 

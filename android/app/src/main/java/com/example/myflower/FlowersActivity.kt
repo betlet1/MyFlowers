@@ -61,7 +61,7 @@ class FlowersActivity : AppCompatActivity() {
 
     // Firebase'den çiçek verilerini çekme
     private fun fetchFlowersFromFirebase() {
-        val database = FirebaseDatabase.getInstance().reference.child("flowers")
+        val database = FirebaseDatabase.getInstance().reference.child("Flowers")
 
         // Veritabanından veri çekme
         database.addValueEventListener(object : ValueEventListener {

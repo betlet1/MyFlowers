@@ -12,7 +12,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myflower.model.Flower
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.squareup.picasso.Picasso
 
 class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val context: Context) :
@@ -39,7 +42,7 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         }
 
         holder.deleteFlowerButton.setOnClickListener {
-            val flowerId = it.tag as String  // Butona atanan tag'i alıyoruz
+            val flowerId = it.tag as String
             onDeleteClick(flowerId)
         }
     }
@@ -56,16 +59,14 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
             intent.putExtra("flower_name", it.name)
             intent.putExtra("flower_image", it.imageUrl)
             intent.putExtra("flower_description", it.description)
-            Log.d("EditClick", "Flower ID: ${it.id}, Name: ${it.name}, Image: ${it.imageUrl}")
             context.startActivity(intent)
         } ?: run {
             Toast.makeText(context, "Çiçek bilgisi bulunamadı.", Toast.LENGTH_SHORT).show()
         }
     }
 
-
     private fun onDeleteClick(flowerId: String) {
-        // Adminden silme işlemi onayı
+        Log.d("DeleteFlower", "Silinecek çiçeğin ID'si: $flowerId")  // ID'yi logla
         val alertDialog = android.app.AlertDialog.Builder(context)
         alertDialog.setTitle("Silme Onayı")
         alertDialog.setMessage("Bu çiçeği silmek istediğinize emin misiniz?")
@@ -73,27 +74,47 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
             // Firebase veritabanından silme işlemi
             deleteFlowerFromDatabase(flowerId)
         }
-        alertDialog.setNegativeButton("Hayır") { dialog, _ ->
-            dialog.dismiss() // Dialog'u kapat
-        }
+        alertDialog.setNegativeButton("Hayır") { dialog, _ -> dialog.dismiss() }
         alertDialog.create().show()
     }
 
-    private fun deleteFlowerFromDatabase(flowerId: String) {
-        val databaseReference = FirebaseDatabase.getInstance().getReference("flowers")
-        databaseReference.child(flowerId).removeValue()
-            .addOnSuccessListener {
-                Toast.makeText(context, "Çiçek başarıyla silindi.", Toast.LENGTH_SHORT).show()
-                Log.d("DeleteFlower", "Çiçek silindi: $flowerId")
-                flowerList.removeAll { it.id == flowerId }
-                notifyDataSetChanged()
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(context, "Hata: ${exception.message}", Toast.LENGTH_LONG).show()
-                Log.e("DeleteFlower", "Silme hatası: ${exception.message}", exception)
-            }
-    }
+    private fun deleteFlowerFromDatabase(customId: String) {
+        val databaseReference = FirebaseDatabase.getInstance().getReference("Flowers")
 
+        // Kendi ID'nizle veri sorgulama
+        databaseReference.orderByChild("id").equalTo(customId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    // Snapshot içinde veriyi bulduk, şimdi Firebase'in otomatik ID'sine (key) erişelim
+                    for (childSnapshot in snapshot.children) {
+                        val firebaseId = childSnapshot.key // Bu Firebase'in otomatik oluşturduğu ID (key)
+                        Log.d("DeleteFlower", "Firebase ID: $firebaseId")
+
+                        // Şimdi bu Firebase ID'yi kullanarak veriyi silebiliriz
+                        firebaseId?.let {
+                            databaseReference.child(it).removeValue()
+                                .addOnSuccessListener {
+                                    // Silme başarılı
+                                    Toast.makeText(context, "Çiçek başarıyla silindi.", Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener { exception ->
+                                    // Silme işlemi başarısız
+                                    Toast.makeText(context, "Hata: ${exception.message}", Toast.LENGTH_LONG).show()
+                                }
+                        }
+                    }
+                } else {
+                    // Veri bulunamadı
+                    Toast.makeText(context, "Çiçek bulunamadı.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Hata durumu
+                Toast.makeText(context, "Veritabanı hatası: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
 
     class FlowerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val flowerImage: ImageView = itemView.findViewById(R.id.flowerImage)
@@ -102,3 +123,4 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         val deleteFlowerButton: Button = itemView.findViewById(R.id.deleteFlowerButton)
     }
 }
+

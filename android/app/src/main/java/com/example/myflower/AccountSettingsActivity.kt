@@ -1,6 +1,7 @@
 package com.example.myflower
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -16,6 +17,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AccountSettingsActivity : AppCompatActivity() {
 
@@ -43,6 +45,7 @@ class AccountSettingsActivity : AppCompatActivity() {
         val mailField = findViewById<EditText>(R.id.mail)
         val sifreField = findViewById<EditText>(R.id.sifre)
         val profilGuncelleButton = findViewById<Button>(R.id.profil_guncelle)
+        val hesabiSilButton = findViewById<Button>(R.id.hesabi_sil)
 
         // Firebase'den kullanıcı bilgilerini al ve ekrana yansıt
         val userRef = database.child("Kullanıcılar").child(userId)
@@ -50,10 +53,10 @@ class AccountSettingsActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val userMap = snapshot.value as? Map<String, Any>
                 userMap?.let {
-                    adField.setText(it["ad"] as? String)
-                    soyadField.setText(it["soyad"] as? String)
-                    kullaniciAdiField.setText(it["kullaniciAdi"] as? String)
-                    mailField.setText(it["email"] as? String)
+                    adField.setText(it["ad"] as? String ?: "")
+                    soyadField.setText(it["soyad"] as? String ?: "")
+                    kullaniciAdiField.setText(it["kullaniciAdi"] as? String ?: "")
+                    mailField.setText(it["email"] as? String ?: "")
                 }
             }
 
@@ -96,6 +99,44 @@ class AccountSettingsActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Lütfen tüm alanları doldurun.", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        hesabiSilButton.setOnClickListener {
+            //Hesabı bulma authentication
+            val currentUser = firebaseAuth.currentUser
+            if (currentUser == null) {
+                Toast.makeText(this, "Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Modern AlertDialog kullanımı
+            val alertDialog = MaterialAlertDialogBuilder(this)
+                .setTitle("Hesap Silme")
+                .setMessage("Hesabınızı silmek istediğinizden emin misiniz?")
+                .setPositiveButton("Evet") { _, _ ->
+                    // Önce veritabanındaki kullanıcı verilerini sil
+                    userRef.removeValue().addOnCompleteListener { dbTask ->
+                        if (dbTask.isSuccessful) {
+                            // Veritabanı silme başarılıysa Authentication'dan sil
+                            currentUser.delete().addOnCompleteListener { authTask ->
+                                if (authTask.isSuccessful) {
+                                    Toast.makeText(this, "Hesabınız başarıyla silindi.", Toast.LENGTH_SHORT).show()
+                                    val intent = Intent(this, LoginActivity::class.java)
+                                    startActivity(intent)
+                                    finish() // Aktiviteyi sonlandır
+                                } else {
+                                    Toast.makeText(this, "Authentication hatası: ${authTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            Toast.makeText(this, "Veritabanı hatası: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .setNegativeButton("Hayır", null)
+                .create()
+
+            alertDialog.show()
         }
 
         // Toolbar'ı tanımla ve geri butonunu aktif et

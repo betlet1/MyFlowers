@@ -56,7 +56,7 @@ class AdminFlowerEditActivity : AppCompatActivity() {
 
     // Firebase'den çiçek bilgilerini çekme
     private fun fetchFlowerDetails() {
-        val database = FirebaseDatabase.getInstance().reference.child("flowers").child(flowerId)
+        val database = FirebaseDatabase.getInstance().reference.child("Flowers").child(flowerId)
         database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val flower = snapshot.getValue(Flower::class.java)
@@ -93,7 +93,7 @@ class AdminFlowerEditActivity : AppCompatActivity() {
         )
 
         // Firebase'e kaydetme
-        val database = FirebaseDatabase.getInstance().reference.child("flowers").child(flowerId)
+        val database = FirebaseDatabase.getInstance().reference.child("Flowers").child(flowerId)
         database.setValue(updatedFlower).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Toast.makeText(this, "Çiçek başarıyla güncellendi", Toast.LENGTH_SHORT).show()

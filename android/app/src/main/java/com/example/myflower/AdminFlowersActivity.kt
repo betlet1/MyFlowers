@@ -65,7 +65,7 @@ class AdminFlowersActivity : AppCompatActivity() {
 
     // Firebase'den veri çekme
     private fun fetchFlowersFromFirebase() {
-        val database = FirebaseDatabase.getInstance().reference.child("flowers")
+        val database = FirebaseDatabase.getInstance().reference.child("Flowers")
 
         // Firebase veri dinleyicisi
         database.addValueEventListener(object : ValueEventListener {
