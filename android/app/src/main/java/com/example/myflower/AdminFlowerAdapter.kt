@@ -16,7 +16,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.concurrent.TimeUnit
 import com.squareup.picasso.Picasso
+import okhttp3.OkHttpClient
+import com.squareup.picasso.OkHttp3Downloader
 
 class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val context: Context) :
     RecyclerView.Adapter<AdminFlowerAdapter.FlowerViewHolder>() {
@@ -31,7 +34,31 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         holder.flowerName.text = flower.name
 
         // Picasso kütüphanesi ile URL'den resmi ImageView'a yükleyelim
-        Picasso.get().load(flower.imageUrl).into(holder.flowerImage)
+        // OkHttpClient ile Picasso yapılandırmasını ekleyelim
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)  // Bağlantı için zaman aşımı
+            .readTimeout(60, TimeUnit.SECONDS)     // Okuma için zaman aşımı
+            .build()
+
+        val picasso = Picasso.Builder(context)
+            .downloader(OkHttp3Downloader(client)) // OkHttp3 ile timeout ayarlarını kullan
+            .loggingEnabled(true)  // Hata loglarını görmek için
+            .indicatorsEnabled(true) // Yükleme göstergelerini etkinleştir
+            .build()
+
+        // Picasso ile görseli yükleyelim
+        picasso.load(flower.imageUrl)
+            .error(R.drawable.bos_resim) // Hata durumunda gösterilecek görsel
+            .into(holder.flowerImage, object : com.squareup.picasso.Callback {
+                override fun onSuccess() {
+                    // Yükleme başarılı
+                }
+
+                override fun onError(e: Exception?) {
+                    Log.e("PicassoError", "Görsel yükleme hatası: ${e?.message}")
+                    // Hata loglaması ve kullanıcıya bilgi verme
+                }
+            })
 
         holder.editFlowerButton.tag = flower.id
         holder.deleteFlowerButton.tag = flower.id
@@ -55,8 +82,8 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         val flower = flowerList.find { it.id == flowerId }
         flower?.let {
             val intent = Intent(context, AdminFlowerEditActivity::class.java)
-            intent.putExtra("flowerId", it.id) // Düzeltme: "flower_id" yerine "flowerId"
-            intent.putExtra("flowerName", it.name) // Intent key'leri güncellendi
+            intent.putExtra("flowerId", it.id)
+            intent.putExtra("flowerName", it.name)
             intent.putExtra("flowerImage", it.imageUrl)
             intent.putExtra("flowerDescription", it.description)
             context.startActivity(intent)

@@ -75,21 +75,19 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
             val aciklama = aciklamaField.text.toString()
 
             if (ad.isNotEmpty() && aciklama.isNotEmpty()) {
-                val flower = Flower(
-                    id = UUID.randomUUID().toString(),
-                    imageUrl = "",  // Başlangıçta boş URL, Cloudinary'ye yükleme sonrası güncellenir
-                    name = ad,
-                    description = aciklama
-                )
-
-                // Resim seçildi mi kontrolü
                 if (imageUri != null) {
+                    val flower = Flower(
+                        id = UUID.randomUUID().toString(),
+                        imageUrl = "", // Başlangıçta boş URL, Cloudinary yükleme sonrası güncellenir
+                        name = ad,
+                        description = aciklama
+                    )
                     uploadImageToCloudinary(imageUri!!, flower)
                 } else {
                     Toast.makeText(this, "Lütfen bir resim seçin.", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "Lütfen tüm alanları doldurun ve resim seçin.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Tüm alanları doldurduğunuzdan emin olun.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -118,9 +116,19 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
             try {
                 val uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap())
                 val imageUrl = uploadResult["url"].toString()  // Cloudinary URL'si
-                flower.imageUrl = imageUrl
 
-                saveFlowerToDatabase(flower)
+                // Cloudinary URL'sinin HTTPS formatında olup olmadığını kontrol etme (isteğe bağlı)
+                val httpsImageUrl = if (imageUrl.startsWith("http://")) {
+                    imageUrl.replace("http://", "https://")  // HTTP'yi HTTPS'ye çevirme
+                } else {
+                    imageUrl
+                }
+
+                flower.imageUrl = httpsImageUrl  // HTTPS URL'si ile güncelle
+
+                runOnUiThread {
+                    saveFlowerToDatabase(flower)  // Resim yüklendikten sonra Firebase'e kaydet
+                }
             } catch (e: Exception) {
                 runOnUiThread {
                     Toast.makeText(this, "Resim yüklenemedi: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -128,6 +136,7 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
             }
         }.start()
     }
+
 
     // URI'den gerçek dosya yolunu al
     private fun getRealPathFromURI(uri: Uri): String {
