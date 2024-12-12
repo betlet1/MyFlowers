@@ -1,4 +1,3 @@
-// AdminFlowerCreateActivity.kt
 package com.example.myflower
 
 import android.Manifest

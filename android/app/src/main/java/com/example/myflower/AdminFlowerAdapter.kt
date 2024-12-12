@@ -55,10 +55,10 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         val flower = flowerList.find { it.id == flowerId }
         flower?.let {
             val intent = Intent(context, AdminFlowerEditActivity::class.java)
-            intent.putExtra("flower_id", it.id)
-            intent.putExtra("flower_name", it.name)
-            intent.putExtra("flower_image", it.imageUrl)
-            intent.putExtra("flower_description", it.description)
+            intent.putExtra("flowerId", it.id) // Düzeltme: "flower_id" yerine "flowerId"
+            intent.putExtra("flowerName", it.name) // Intent key'leri güncellendi
+            intent.putExtra("flowerImage", it.imageUrl)
+            intent.putExtra("flowerDescription", it.description)
             context.startActivity(intent)
         } ?: run {
             Toast.makeText(context, "Çiçek bilgisi bulunamadı.", Toast.LENGTH_SHORT).show()

@@ -9,30 +9,19 @@
     tools:context=".AdminFlowerEditActivity">
 
     <!-- Toolbar -->
+
+    <!-- Başlık -->
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:background="@color/mor"
         android:elevation="4dp"
-        app:title="Çiçek Güncelleme Formu"
+        app:title="Çiçek Güncelleme"
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ik_geri"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Başlık -->
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Çiçek Güncelleme"
-        android:textColor="@color/griRenk01"
-        android:textSize="24sp"
-        android:fontFamily="sans-serif-medium"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
 
     <!-- Çiçek Adı Girişi -->
     <EditText
@@ -42,7 +31,7 @@
         android:hint="Çiçek Adı"
         android:padding="12dp"
         android:textColorHint="@color/griRenk01"
-        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
