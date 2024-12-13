@@ -68,18 +68,14 @@ class FlowerDetailsActivity : AppCompatActivity() {
         flowerImageUrl?.let { url ->
             Picasso.get().load(url).into(flowerImageView, object : com.squareup.picasso.Callback {
                 override fun onSuccess() {
-                    // Resim başarılı şekilde yüklendi
-                    // Burada ekstra bir işlem yapmanıza gerek yok, sadece görsellik için onSuccess kullanabilirsiniz
-                }
+                 }
 
                 override fun onError(e: Exception?) {
-                    // Hata durumunda yapılacak işlemler
                     flowerImageView.setImageResource(R.drawable.bos_resim) // Hata durumunda bir yedek resim
                     Toast.makeText(this@FlowerDetailsActivity, "Resim yüklenemedi", Toast.LENGTH_SHORT).show()
                 }
             })
         }
-
 
         // Firebase Realtime Database üzerinden çiçek detaylarını almak
         if (flowerId != null) {
@@ -99,13 +95,12 @@ class FlowerDetailsActivity : AppCompatActivity() {
         // "Çiçeklerime Ekle" butonuna tıklanma işlemi (Firebase'e kaydetme)
         addToMyFlowersButton.setOnClickListener {
             val userId = FirebaseAuth.getInstance().currentUser?.uid  // Giriş yapan kullanıcının ID'si
-            val flowerId = intent.getStringExtra("flower_id")  // Çiçek ID'sini alın
 
             if (userId != null && flowerId != null) {
                 val database = FirebaseDatabase.getInstance().reference
 
                 // Çiçek ID'sini kullanıcının kaydedilen çiçekler listesine kaydediyoruz
-                database.child("Kullanıcılar").child(userId).child("savedFlowers").child(flowerId).setValue(flowerId)
+                database.child("Kullanıcılar").child(userId).child("savedFlowers").child(flowerId!!).setValue(flowerId)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Çiçek Kaydedildi", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this, MyFlowersActivity::class.java)

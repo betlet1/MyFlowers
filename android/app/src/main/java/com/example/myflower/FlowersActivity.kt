@@ -73,9 +73,6 @@ class FlowersActivity : AppCompatActivity() {
                         val flower = flowerSnapshot.getValue(Flower::class.java)
                         if (flower != null) {
                             flowerList.add(flower)
-                        } else {
-                            // Eğer çiçek verisi null ise bir varsayılan çiçek ekle
-                            flowerList.add(getDefaultFlower())
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -89,15 +86,6 @@ class FlowersActivity : AppCompatActivity() {
                 Toast.makeText(this@FlowersActivity, "Veri çekme hatası: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
-    }
-
-    private fun getDefaultFlower(): Flower {
-        return Flower(
-            id = "default_id",  // Varsayılan bir id
-            name = "Varsayılan Çiçek",
-            description = "Bu bir varsayılan çiçektir.",
-            imageUrl = "https://example.com/default_image.png" // Varsayılan bir resim URL'si
-        )
     }
 
     // Menü oluşturma

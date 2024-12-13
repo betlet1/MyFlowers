@@ -38,6 +38,7 @@ class FlowerAdapter(private val flowerList: ArrayList<Flower>, private val conte
 
     private fun onDetailsClick(flower: Flower) {
         val intent = Intent(context, FlowerDetailsActivity::class.java)
+        intent.putExtra("flower_id", flower.id)
         intent.putExtra("flower_name", flower.name)
         intent.putExtra("flower_image", flower.imageUrl) // imageUrl'i gönderiyoruz
         intent.putExtra("flower_description", flower.description)
