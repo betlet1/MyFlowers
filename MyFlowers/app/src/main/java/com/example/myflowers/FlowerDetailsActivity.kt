@@ -18,12 +18,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
 
+
 class FlowerDetailsActivity : AppCompatActivity() {
 
     private lateinit var flowerNameTextView: TextView
     private lateinit var flowerDescriptionTextView: TextView
     private lateinit var flowerImageView: ImageView
     private lateinit var addToMyFlowersButton: Button
+    private lateinit var setAlarmButton: Button // Alarm Kur Butonu
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,11 +116,14 @@ class FlowerDetailsActivity : AppCompatActivity() {
                     addToMyFlowersButton.text = "Çiçeklerimden Çıkar"
                     addToMyFlowersButton.setBackgroundColor(ContextCompat.getColor(this, R.color.kirmizi))
                     addToMyFlowersButton.setOnClickListener { removeFromMyFlowers(flowerId) }
+
+
                 } else {
                     // Çiçek listede değilse "Ekle" olarak güncelle
                     addToMyFlowersButton.text = "Çiçeklerime Ekle"
                     addToMyFlowersButton.setBackgroundColor(ContextCompat.getColor(this, R.color.yesilmavi))
                     addToMyFlowersButton.setOnClickListener { addToMyFlowers(flowerId) }
+
                 }
             }
             .addOnFailureListener {
@@ -157,4 +162,6 @@ class FlowerDetailsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Çiçeklerim listesine eklenemedi", Toast.LENGTH_SHORT).show()
             }
     }
+
+
 }

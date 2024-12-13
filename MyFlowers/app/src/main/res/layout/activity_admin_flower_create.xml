@@ -38,7 +38,7 @@
     <EditText
         android:id="@+id/flowerDescriptionEditText"
         android:layout_width="0dp"
-        android:layout_height="250dp"
+        android:layout_height="260dp"
         android:hint="Çiçek Açıklaması"
         android:padding="12dp"
         android:textColorHint="@color/griRenk01"
@@ -47,7 +47,7 @@
         app:layout_constraintTop_toBottomOf="@id/flowerNameEditText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="5dp"
         android:layout_marginHorizontal="16dp" />
 
     <!-- Resim Yükle -->
@@ -63,15 +63,15 @@
         app:layout_constraintTop_toBottomOf="@id/flowerDescriptionEditText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginHorizontal="16dp" />
 
     <!-- Yüklenen Resim Önizlemesi -->
     <ImageView
         android:id="@+id/flowerImageView"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="5dp"
         android:scaleType="centerCrop"
         android:contentDescription="Seçilen Çiçek Resmi"
         app:layout_constraintTop_toBottomOf="@id/uploadImageButton"
@@ -92,6 +92,6 @@
         app:layout_constraintTop_toBottomOf="@id/flowerImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginHorizontal="16dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

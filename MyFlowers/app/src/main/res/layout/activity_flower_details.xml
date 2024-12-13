@@ -55,31 +55,33 @@
                 android:scaleType="centerCrop"
                 android:contentDescription="Çiçek Resmi"
                 android:background="@drawable/bos_resim"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="10dp"
                 android:layout_gravity="center_horizontal" />  <!-- Yandan ortalama için -->
 
-
-            <!-- Çiçek Adı -->
             <TextView
                 android:id="@+id/flowerNameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Çiçek Adı"
-                android:padding="12dp"
+                android:textSize="22sp"
+                android:textColor="@color/kirmizi"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:gravity="center"
+                android:padding="10dp"
                 android:textColorHint="@color/griRenk01"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="6dp" />
 
-            <!-- Çiçek Özellikleri (Daha fazla alan) -->
             <TextView
                 android:id="@+id/flowerDescriptionEditText"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="310dp"
                 android:hint="Çiçek Özellikleri"
                 android:padding="12dp"
                 android:gravity="top|start"
                 android:inputType="textMultiLine"
                 android:textColorHint="@color/griRenk01"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="10dp" />
 
             <!-- Çiçeklerime Ekle Butonu -->
             <Button
