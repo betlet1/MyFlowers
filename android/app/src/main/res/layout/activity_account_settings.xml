@@ -51,7 +51,7 @@
                 android:id="@+id/ri_profile_image"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src="@drawable/ik_account_beyaz"
+                android:src="@drawable/ik_account_ayar_beyaz"
                 app:srcCompat="@drawable/bos_resim"
                 android:layout_marginTop="20dp" />
 

@@ -3,6 +3,7 @@ package com.example.myflower
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -39,9 +40,7 @@ class MyFlowersActivity : AppCompatActivity() {
 
         // Geri butonuna tıklanma
         toolbar.setNavigationOnClickListener {
-            val intent = Intent(this, FlowersActivity::class.java)  // FlowersActivity'ye git
-            startActivity(intent)  // Yeni aktiviteyi başlat
-            finish()  // Mevcut aktiviteyi sonlandır
+           finish()  // Mevcut aktiviteyi sonlandır
         }
 
         // Sistem çubuğuyla uyumlu pencere ayarları
@@ -78,47 +77,60 @@ class MyFlowersActivity : AppCompatActivity() {
             return
         }
 
+        val userId = currentUser.uid
         val database = FirebaseDatabase.getInstance().reference
-        val savedFlowersRef = database.child("Kullanıcılar").child(currentUser.uid).child("savedFlowers")
+        val savedFlowersRef = database.child("Kullanıcılar").child(userId).child("savedFlowers")
 
-        // "Kullanıcılar" altındaki "savedFlowers" verisini çekiyoruz
         savedFlowersRef.get().addOnSuccessListener { snapshot ->
             if (!snapshot.exists()) {
                 Toast.makeText(this@MyFlowersActivity, "Kaydedilmiş çiçek bulunamadı.", Toast.LENGTH_SHORT).show()
+                Log.e("FetchMyFlowers", "Kullanıcı: $userId - Kaydedilmiş çiçek yok.")
                 return@addOnSuccessListener
             }
-
             flowersList.clear()
-
-            // Çiçek ID'lerini alıp "Flowers" tablosundan veri çekiyoruz
             for (flowerSnapshot in snapshot.children) {
                 val flowerId = flowerSnapshot.key
-                flowerId?.let { getFlowerDetails(it) }
+                if (flowerId == null) {
+                    Log.e("FetchMyFlowers", "Kullanıcı: $userId - Geçersiz çiçek ID.")
+                    continue
+                }
+                fetchFlowerDetails(flowerId)
             }
         }.addOnFailureListener {
             Toast.makeText(this@MyFlowersActivity, "Veri çekme hatası: ${it.message}", Toast.LENGTH_SHORT).show()
+            Log.e("FetchMyFlowers", "Kullanıcı: $userId - Veri çekme hatası: ${it.message}")
         }
     }
 
     // Flower ID'sine göre "Flowers" tablosundan çiçek detaylarını çekme
-    private fun getFlowerDetails(flowerId: String) {
-        val database = FirebaseDatabase.getInstance().reference
-        val flowerRef = database.child("Flowers").child(flowerId)
+    private fun fetchFlowerDetails(flowerId: String) {
+        val database = FirebaseDatabase.getInstance().reference.child("Flowers")
 
-        // "Flowers" tablosundan çiçek detaylarını alıyoruz
-        flowerRef.get().addOnSuccessListener { dataSnapshot ->
-            if (dataSnapshot.exists()) {
-                val flower = dataSnapshot.getValue(Flower::class.java)
-                flower?.let {
-                    flowersList.add(it)  // Çiçeği listeye ekliyoruz
-                    flowerAdapter.notifyDataSetChanged()  // Adapter'ı güncelliyoruz
+        // `id` alanına göre sorgulama yap
+        database.orderByChild("id").equalTo(flowerId).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                for (childSnapshot in snapshot.children) {
+                    val flower = childSnapshot.getValue(Flower::class.java)
+                    if (flower != null) {
+                        flowersList.add(flower) // Eşleşen çiçeği listeye ekle
+                        flowerAdapter.notifyDataSetChanged() // Listeyi güncelle
+                    }
                 }
             } else {
-                Toast.makeText(this@MyFlowersActivity, "Çiçek verileri bulunamadı", Toast.LENGTH_SHORT).show()
+                // Eğer eşleşen veri yoksa
+                Toast.makeText(this@MyFlowersActivity, "Çiçek bulunamadı: $flowerId", Toast.LENGTH_SHORT).show()
+                Log.e("FetchFlowerDetails", "Çiçek ID bulunamadı: $flowerId")
             }
-        }.addOnFailureListener {
-            Toast.makeText(this@MyFlowersActivity, "Çiçek verileri alınamadı", Toast.LENGTH_SHORT).show()
+        }.addOnFailureListener { error ->
+            Toast.makeText(this@MyFlowersActivity, "Çiçek verisi alınamadı: ${error.message}", Toast.LENGTH_SHORT).show()
+            Log.e("FetchFlowerDetails", "Çiçek verisi alınamadı: ${error.message}")
         }
+    }
+
+    // Sayfa her görünür olduğunda çağrılır, verileri yeniden çekip günceller
+    override fun onResume() {
+        super.onResume()
+        fetchMyFlowersFromFirebase() // Listeyi yenile
     }
 }
 

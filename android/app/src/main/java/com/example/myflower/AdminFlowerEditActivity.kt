@@ -63,7 +63,7 @@ class AdminFlowerEditActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
         toolbar.setNavigationOnClickListener {
-            finish()  // Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
+            finish()
         }
 
         // Intent verilerini al
@@ -83,7 +83,7 @@ class AdminFlowerEditActivity : AppCompatActivity() {
         flowerDescriptionEditText.setText(flowerDescription)
         Picasso.get().load(flowerImage).into(flowerImageView)
 
-        // Yeni resim URL'sini tutmak için değişkeni güncelle
+        // Yeni resim URL'sini tutmak için değişkeni güncelleme
         imageUrl = flowerImage ?: ""
 
         // Resim yükleme butonu işlemi

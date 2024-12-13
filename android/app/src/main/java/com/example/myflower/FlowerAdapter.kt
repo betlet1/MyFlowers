@@ -24,11 +24,11 @@ class FlowerAdapter(private val flowerList: ArrayList<Flower>, private val conte
         val flower = flowerList[position]
         holder.flowerName.text = flower.name
 
-        // Picasso kütüphanesi ile URL'den resmi ImageView'a yükleyelim
+        // Picasso kütüphanesi ile URL'den resmi ImageView'a yükleme
         Picasso.get().load(flower.imageUrl).into(holder.flowerImage)
 
         holder.detailsButton.setOnClickListener {
-            onDetailsClick(flower)  // onDetailsClick fonksiyonunu burada çağırıyoruz
+            onDetailsClick(flower)
         }
     }
 
@@ -40,9 +40,9 @@ class FlowerAdapter(private val flowerList: ArrayList<Flower>, private val conte
         val intent = Intent(context, FlowerDetailsActivity::class.java)
         intent.putExtra("flower_id", flower.id)
         intent.putExtra("flower_name", flower.name)
-        intent.putExtra("flower_image", flower.imageUrl) // imageUrl'i gönderiyoruz
+        intent.putExtra("flower_image", flower.imageUrl)
         intent.putExtra("flower_description", flower.description)
-        context.startActivity(intent)  // context'i doğru kullanıyoruz
+        context.startActivity(intent)
     }
 
     class FlowerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

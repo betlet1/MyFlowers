@@ -21,7 +21,7 @@ class AdminLoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_admin_login)
 
         firebaseAuth = FirebaseAuth.getInstance()
-        databaseReference = FirebaseDatabase.getInstance().getReference("Admin") // Admin kontrolü için doğru referans
+        databaseReference = FirebaseDatabase.getInstance().getReference("Admin")
         editTextEmail = findViewById(R.id.mailInput)
         editTextPassword = findViewById(R.id.passwordInput)
 
@@ -60,17 +60,14 @@ class AdminLoginActivity : AppCompatActivity() {
                 if (snapshot.exists()) {
                     val role = snapshot.getValue(String::class.java)
                     if (role == "admin") {
-                        // Kullanıcı admin ise admin ekranına yönlendir
                         val intent = Intent(this@AdminLoginActivity, AdminFlowersActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else {
-                        // Kullanıcı admin değilse
                         Toast.makeText(this@AdminLoginActivity, "Bu kullanıcı admin değil.", Toast.LENGTH_SHORT).show()
                         firebaseAuth.signOut()
                     }
                 } else {
-                    // Role bilgisi yoksa
                     Toast.makeText(this@AdminLoginActivity, "Admin bilgisi bulunamadı.", Toast.LENGTH_SHORT).show()
                     firebaseAuth.signOut()
                 }

@@ -20,7 +20,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="50dp"
-            android:src="@drawable/ik_account_beyaz"
+            android:src="@drawable/ik_account_mavi"
             android:contentDescription="Admin Logo"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"

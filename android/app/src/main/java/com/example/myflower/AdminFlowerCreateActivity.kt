@@ -45,7 +45,6 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_flower_create)
 
-        // Firebase Auth ve Database referanslar
         firebaseAuth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
 
@@ -63,7 +62,7 @@ class AdminFlowerCreateActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
         toolbar.setNavigationOnClickListener {
-            finish()  // Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
+            finish()
         }
 
         uploadImageButton.setOnClickListener {

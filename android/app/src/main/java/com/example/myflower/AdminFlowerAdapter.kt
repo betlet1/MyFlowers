@@ -33,16 +33,15 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         val flower = flowerList[position]
         holder.flowerName.text = flower.name
 
-        // Picasso kütüphanesi ile URL'den resmi ImageView'a yükleyelim
-        // OkHttpClient ile Picasso yapılandırmasını ekleyelim
+        // OkHttpClient ile Picasso yapılandırmasını ekleme
         val client = OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)  // Bağlantı için zaman aşımı
-            .readTimeout(60, TimeUnit.SECONDS)     // Okuma için zaman aşımı
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .build()
 
         val picasso = Picasso.Builder(context)
             .downloader(OkHttp3Downloader(client)) // OkHttp3 ile timeout ayarlarını kullan
-            .loggingEnabled(true)  // Hata loglarını görmek için
+            .loggingEnabled(true)
             .indicatorsEnabled(true) // Yükleme göstergelerini etkinleştir
             .build()
 
@@ -51,7 +50,6 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
             .error(R.drawable.bos_resim) // Hata durumunda gösterilecek görsel
             .into(holder.flowerImage, object : com.squareup.picasso.Callback {
                 override fun onSuccess() {
-                    // Yükleme başarılı
                 }
 
                 override fun onError(e: Exception?) {
@@ -98,7 +96,6 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         alertDialog.setTitle("Silme Onayı")
         alertDialog.setMessage("Bu çiçeği silmek istediğinize emin misiniz?")
         alertDialog.setPositiveButton("Evet") { _, _ ->
-            // Firebase veritabanından silme işlemi
             deleteFlowerFromDatabase(flowerId)
         }
         alertDialog.setNegativeButton("Hayır") { dialog, _ -> dialog.dismiss() }
@@ -112,7 +109,7 @@ class AdminFlowerAdapter(private val flowerList: ArrayList<Flower>, private val 
         databaseReference.orderByChild("id").equalTo(customId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    // Snapshot içinde veriyi bulduk, şimdi Firebase'in otomatik ID'sine (key) erişelim
+                    // Snapshot içinde veriyi bulundu, Firebase'in otomatik ID'sine (key) erişme
                     for (childSnapshot in snapshot.children) {
                         val firebaseId = childSnapshot.key // Bu Firebase'in otomatik oluşturduğu ID (key)
                         Log.d("DeleteFlower", "Firebase ID: $firebaseId")

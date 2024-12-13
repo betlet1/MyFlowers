@@ -31,11 +31,9 @@ class AdminAccountSettingsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_admin_account_settings)
 
-        // Firebase Auth ve Database referanslar
         firebaseAuth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
 
-        // Kullanıcı ID'yi al
         userId = firebaseAuth.currentUser?.uid ?: return
 
         // Formdaki alanlar
@@ -69,7 +67,6 @@ class AdminAccountSettingsActivity : AppCompatActivity() {
                 // Firebase Authentication ile şifreyi güncelle
                 firebaseAuth.currentUser?.updatePassword(sifre)?.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        // Firebase veritabanına e-posta bilgisini güncelle
                         val updatedUserMap = mapOf(
                             "email" to mail
                         )
@@ -94,6 +91,7 @@ class AdminAccountSettingsActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)  // Geri butonunu aktif
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         // Geri butonuna tıklanma
         toolbar.setNavigationOnClickListener {

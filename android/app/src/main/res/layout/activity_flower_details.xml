@@ -50,7 +50,7 @@
             <!-- Çiçek Resmi -->
             <ImageView
                 android:id="@+id/flowerImageView"
-                android:layout_width="200dp"
+                android:layout_width="300dp"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
                 android:contentDescription="Çiçek Resmi"

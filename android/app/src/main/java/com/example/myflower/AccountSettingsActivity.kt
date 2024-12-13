@@ -31,11 +31,9 @@ class AccountSettingsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_account_settings)
 
-        // Firebase Auth ve Database referanslar
         firebaseAuth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
 
-        // Kullanıcı ID'yi al
         userId = firebaseAuth.currentUser?.uid ?: return
 
         // Formdaki alanlar
@@ -109,12 +107,11 @@ class AccountSettingsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Modern AlertDialog kullanımı
             val alertDialog = MaterialAlertDialogBuilder(this)
                 .setTitle("Hesap Silme")
                 .setMessage("Hesabınızı silmek istediğinizden emin misiniz?")
                 .setPositiveButton("Evet") { _, _ ->
-                    // Önce veritabanındaki kullanıcı verilerini sil
+                    // Önce veritabanındaki kullanıcı verilerini siler
                     userRef.removeValue().addOnCompleteListener { dbTask ->
                         if (dbTask.isSuccessful) {
                             // Veritabanı silme başarılıysa Authentication'dan sil
@@ -123,7 +120,7 @@ class AccountSettingsActivity : AppCompatActivity() {
                                     Toast.makeText(this, "Hesabınız başarıyla silindi.", Toast.LENGTH_SHORT).show()
                                     val intent = Intent(this, LoginActivity::class.java)
                                     startActivity(intent)
-                                    finish() // Aktiviteyi sonlandır
+                                    finish()
                                 } else {
                                     Toast.makeText(this, "Authentication hatası: ${authTask.exception?.message}", Toast.LENGTH_SHORT).show()
                                 }
@@ -144,6 +141,7 @@ class AccountSettingsActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)  // Geri butonunu aktif et
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         // Geri butonuna tıklanma
         toolbar.setNavigationOnClickListener {

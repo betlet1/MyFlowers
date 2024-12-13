@@ -39,7 +39,7 @@ class AdminFlowersActivity : AppCompatActivity() {
         // TextView üzerindeki başlığı kullanması için Toolbar başlığını kaldırma
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // Edge to edge padding düzenlemesi
+        // Edge to edge padding düzenlemesi saat şarz bilgileri gözükecek şekilde ayarlar
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.admin_flowers)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -47,8 +47,7 @@ class AdminFlowersActivity : AppCompatActivity() {
         }
 
         // RecyclerView'i ve adapter'ı başlatma
-        initRecyclerView()
-    }
+        initRecyclerView()    }
 
     private fun initRecyclerView() {
         recyclerView = findViewById(R.id.adminFlowerRecyclerView)
@@ -59,7 +58,6 @@ class AdminFlowersActivity : AppCompatActivity() {
         adminFlowerAdapter = AdminFlowerAdapter(adminFlowerList, this)
         recyclerView.adapter = adminFlowerAdapter
 
-        // Firebase'den verileri çekme
         fetchFlowersFromFirebase()
     }
 
@@ -82,7 +80,6 @@ class AdminFlowersActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Hata durumunda işlem
                 Toast.makeText(this@AdminFlowersActivity, "Veri çekme hatası: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
@@ -90,7 +87,7 @@ class AdminFlowersActivity : AppCompatActivity() {
 
     // Menü oluşturma
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.admin_alt_menu, menu) // Menü dosyasını inflate et
+        menuInflater.inflate(R.menu.admin_alt_menu, menu)
         return true
     }
 

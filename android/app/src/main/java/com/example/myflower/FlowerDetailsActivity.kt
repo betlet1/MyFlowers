@@ -3,6 +3,7 @@ package com.example.myflower
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.myflower.model.Flower
@@ -33,12 +35,13 @@ class FlowerDetailsActivity : AppCompatActivity() {
         // Toolbar'ı tanımlayıp geri butonunu aktif etme
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)  // Geri butonunu aktif
+        supportActionBar?.setDisplayHomeAsUpEnabled(true) // Geri butonunu aktif
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         // Geri butonuna tıklanma işlemi
         toolbar.setNavigationOnClickListener {
-            finish()  // Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
+            finish() // Aktiviteyi sonlandırarak bir önceki aktiviteye dönme
         }
 
         // Sistem çubuğuyla uyumlu pencere ayarları
@@ -55,29 +58,33 @@ class FlowerDetailsActivity : AppCompatActivity() {
         addToMyFlowersButton = findViewById(R.id.addToMyFlowersButton)
 
         // Intent ile gelen çiçek verilerini alma
-        val flowerId = intent.getStringExtra("flower_id") // Çiçek ID'sini alıyoruz
+        val flowerId = intent.getStringExtra("flower_id")
         val flowerName = intent.getStringExtra("flower_name")
         val flowerDescription = intent.getStringExtra("flower_description")
-        val flowerImageUrl = intent.getStringExtra("flower_image_url")
-
+        val flowerImageUrl = intent.getStringExtra("flower_image")
+        Log.d("Picasso", "Yüklenen URL: $flowerImageUrl")
         // Çiçek bilgilerini UI'da görüntüleme
         flowerName?.let { flowerNameTextView.text = it }
         flowerDescription?.let { flowerDescriptionTextView.text = it }
 
         // Cloudinary URL ile çiçek resmini gösterme
         flowerImageUrl?.let { url ->
+            Log.d("Picasso", "Yüklenen URL: $url")
+
             Picasso.get().load(url).into(flowerImageView, object : com.squareup.picasso.Callback {
+
                 override fun onSuccess() {
-                 }
+                    Log.d("Picasso", "Resim başarıyla yüklendi!")
+                }
 
                 override fun onError(e: Exception?) {
-                    flowerImageView.setImageResource(R.drawable.bos_resim) // Hata durumunda bir yedek resim
-                    Toast.makeText(this@FlowerDetailsActivity, "Resim yüklenemedi", Toast.LENGTH_SHORT).show()
+                    Log.e("Picasso", "Resim yüklenemedi: ${e?.message}")
+                    flowerImageView.setImageResource(R.drawable.bos_resim)
                 }
             })
         }
 
-        // Firebase Realtime Database üzerinden çiçek detaylarını almak
+        // Çiçek detaylarını Firebase'den almak ve UI'yı güncellemek
         if (flowerId != null) {
             val database = FirebaseDatabase.getInstance().reference
             database.child("Flowers").child(flowerId).get().addOnSuccessListener { dataSnapshot ->
@@ -90,37 +97,65 @@ class FlowerDetailsActivity : AppCompatActivity() {
                     }
                 }
             }
+            // Butonun başlangıç durumunu güncelle
+            updateButtonState(flowerId)
         }
+    }
 
-        // "Çiçeklerime Ekle" butonuna tıklanma işlemi (Firebase'e kaydetme)
-        addToMyFlowersButton.setOnClickListener {
-            val userId = FirebaseAuth.getInstance().currentUser?.uid  // Giriş yapan kullanıcının ID'si
+    // Çiçeğin kullanıcının kaydedilen çiçekler listesinde olup olmadığını kontrol etme ve UI'yı güncelleme
+    private fun updateButtonState(flowerId: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val database = FirebaseDatabase.getInstance().reference
 
-            if (userId != null && flowerId != null) {
-                val database = FirebaseDatabase.getInstance().reference
-
-                // Çiçek ID'sini kullanıcının kaydedilen çiçekler listesine kaydediyoruz
-                database.child("Kullanıcılar").child(userId).child("savedFlowers").child(flowerId!!).setValue(flowerId)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Çiçek Kaydedildi", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this, MyFlowersActivity::class.java)
-                        startActivity(intent)
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(this, "Çiçek kaydedilemedi", Toast.LENGTH_SHORT).show()
-                    }
-            } else {
-                // Kullanıcı giriş yapmamış veya çiçek ID'si eksik
-                if (userId == null) {
-                    Toast.makeText(this, "Lütfen giriş yapın", Toast.LENGTH_SHORT).show()
-                    // Giriş yapmayan kullanıcıyı giriş sayfasına yönlendirebilirsiniz
-                    val loginIntent = Intent(this, LoginActivity::class.java)  // LoginActivity'yi uygun şekilde düzenleyin
-                    startActivity(loginIntent)
+        database.child("Kullanıcılar").child(userId).child("savedFlowers").child(flowerId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    // Çiçek listede mevcutsa "Çıkar" olarak güncelle
+                    addToMyFlowersButton.text = "Çiçeklerimden Çıkar"
+                    addToMyFlowersButton.setBackgroundColor(ContextCompat.getColor(this, R.color.kirmizi))
+                    addToMyFlowersButton.setOnClickListener { removeFromMyFlowers(flowerId) }
                 } else {
-                    Toast.makeText(this, "Çiçek bilgisi eksik", Toast.LENGTH_SHORT).show()
+                    // Çiçek listede değilse "Ekle" olarak güncelle
+                    addToMyFlowersButton.text = "Çiçeklerime Ekle"
+                    addToMyFlowersButton.setBackgroundColor(ContextCompat.getColor(this, R.color.yesilmavi))
+                    addToMyFlowersButton.setOnClickListener { addToMyFlowers(flowerId) }
                 }
             }
-        }
+            .addOnFailureListener {
+                Toast.makeText(this, "Durum kontrol edilemedi", Toast.LENGTH_SHORT).show()
+            }
+    }
 
+    // Çiçeği kullanıcının kaydedilen çiçekler listesinden çıkarma işlemi
+    private fun removeFromMyFlowers(flowerId: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val database = FirebaseDatabase.getInstance().reference
+
+        database.child("Kullanıcılar").child(userId).child("savedFlowers").child(flowerId)
+            .removeValue()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Çiçeklerim listesinden çıkarıldı", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Çiçeklerim listesinden çıkarılamadı", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // Çiçeği kullanıcının kaydedilen çiçekler listesine ekleme işlemi
+    private fun addToMyFlowers(flowerId: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val database = FirebaseDatabase.getInstance().reference
+
+        database.child("Kullanıcılar").child(userId).child("savedFlowers").child(flowerId)
+            .setValue(flowerId)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Çiçeklerim listesine eklendi", Toast.LENGTH_SHORT).show()
+                finish() // Butonu güncelle
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Çiçeklerim listesine eklenemedi", Toast.LENGTH_SHORT).show()
+            }
     }
 }
